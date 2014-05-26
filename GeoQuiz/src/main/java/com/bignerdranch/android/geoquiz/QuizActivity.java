@@ -24,15 +24,14 @@ public class QuizActivity extends ActionBarActivity {
     private Button mCheatButton;
     private TextView mQuestionTextView;
 
-    private boolean mIsCheater;
-
-    private TrueFalse[] mQuestionBank = new TrueFalse[] {
+    private static TrueFalse[] mQuestionBank = new TrueFalse[] {
             new TrueFalse(R.string.question_oceans, true),
             new TrueFalse(R.string.question_mideast, false),
             new TrueFalse(R.string.question_africa, false),
             new TrueFalse(R.string.question_americas, true),
             new TrueFalse(R.string.question_asia, true),
     };
+    private static boolean[] mCheatedOnQuestions = new boolean[mQuestionBank.length];
 
     private int mCurrentIndex = 0;
 
@@ -86,7 +85,6 @@ public class QuizActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -114,7 +112,9 @@ public class QuizActivity extends ActionBarActivity {
         if (data == null) {
             return;
         }
-        mIsCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false);
+        if (data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false)) {
+            mCheatedOnQuestions[mCurrentIndex] = true;
+        }
     }
 
 
@@ -159,7 +159,7 @@ public class QuizActivity extends ActionBarActivity {
 
         int messageResId = 0;
 
-        if (mIsCheater) {
+        if (mCheatedOnQuestions[mCurrentIndex]) {
             messageResId = R.string.judgment_toast;
         } else {
             if (userPressedTrue == answerIsTrue) {
